@@ -36,10 +36,12 @@ public class ApacheHttpConnector implements Runnable {
 	
 	private String url;
 	private String postData;
+	private String[] headers;
 	
-	public ApacheHttpConnector(String url, String postData) {
+	public ApacheHttpConnector(String url, String postData, String headers) {
 		this.url = url;
 		this.postData = postData;
+		this.headers = headers.split(":");
 	}
 	
 	public void postTask() throws Exception {
@@ -78,6 +80,11 @@ public class ApacheHttpConnector implements Runnable {
 		HttpPost http = new HttpPost(url);
 		StringEntity postEntity = new StringEntity(postData);
 		http.setEntity(postEntity);
+		if (headers != null && headers.length >= 2) {
+			for (int i = 0; i < headers.length; i+= 2) {
+				http.addHeader(headers[i], headers[i+1]);
+			}
+		}
 		CloseableHttpResponse response = client.execute(http);
 		System.out.println(EntityUtils.toString(response.getEntity()));
 //		HttpEntity entity = response.getEntity();
